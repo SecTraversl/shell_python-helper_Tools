@@ -13,6 +13,7 @@
 # - Notes:
 #   - ref:  https://stackoverflow.com/questions/2043453/executing-multi-line-statements-in-the-one-line-command-line/29565580#29565580
 #   - specific ref:  https://stackoverflow.com/a/29565580
+#   - useful replacement for pytz - use .astimezone(tz=dt.timezone.utc) - https://docs.python.org/3/library/datetime.html#examples-of-usage-datetime
 #
 ###########
 # EXAMPLE
