@@ -1,0 +1,51 @@
+#!/bin/bash
+## awk_select_startColumnCommaDelimited
+
+
+# - ref:  https://stackoverflow.com/questions/48504316/regex-or-split-in-python-for-shell-awk-equivalent
+# - ref:  line continuation in bash scripts - https://stackoverflow.com/a/35931689
+# - example:  
+#        x=$(cat /usr/share/distro-info/ubuntu.csv)
+#        awk_select_startColumnCommaDelimited "$x" 0 | head -3
+#        << '#output'
+#        version,codename,series,created,release,eol,eol-server,eol-esm
+#        4.10,Warty Warthog,warty,2004-03-05,2004-10-20,2006-04-30
+#        5.04,Hoary Hedgehog,hoary,2004-10-20,2005-04-08,2006-10-31
+#        #output
+# - example:  
+#        x=$(cat /usr/share/distro-info/ubuntu.csv)
+#        awk_select_startColumnCommaDelimited "$x" 3 | head -3
+#        << '#output'
+#        created,release,eol,eol-server,eol-esm
+#        2004-03-05,2004-10-20,2006-04-30
+#        2004-10-20,2005-04-08,2006-10-31
+#        #output
+# - output:  see above
+# - notes:  Returns the output starting at the designated column number
+#       - Originally used awk for this, but this was a more straight-forward approach
+
+
+# if arg1 and arg2 are supplied, this will execute
+[ "$#" -eq 2 ]  &&
+function awk_select_startColumnCommaDelimited () {
+    python3 -c "import sys
+def string_split_and_select_start_column_plus_rejoin_newline(text: str, delimiter: str, column_start: int):
+    '''Splits a multiline string first by newline, then by the given delimiter.  Returns the columns of interest starting at column_start.'''
+    lines_array = text.splitlines()
+    split_results = [e.split(delimiter) for e in lines_array]
+    return_elements = [e[column_start:] for e in split_results]
+    rejoined_by_delimiter = [delimiter.join(e) for e in return_elements]
+    rejoined_with_newlines = '\n'.join(rejoined_by_delimiter)
+    return rejoined_with_newlines
+delimiter = ','
+text_to_parse = sys.argv[1]
+column_start = int(sys.argv[2])
+results = string_split_and_select_start_column_plus_rejoin_newline(text_to_parse, delimiter, column_start)
+print(results)
+" "$1" "$2"
+} &&
+
+awk_select_startColumnCommaDelimited "$1" "$2"  || 
+
+echo "Two args are required.  arg1 = text body.  arg2 = column number to start from"
+
